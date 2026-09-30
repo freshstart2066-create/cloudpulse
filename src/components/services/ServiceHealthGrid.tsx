@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useCloud } from '../../context/CloudContext';
-import { Server, RotateCcw, CheckCircle, AlertCircle, Clock } from 'lucide-react';
+import { Server, RotateCcw, Sliders, CheckCircle, AlertCircle } from 'lucide-react';
+import { Microservice } from '../../types/cloud';
+import { PodScaleModal } from '../modals/PodScaleModal';
 
 export const ServiceHealthGrid: React.FC = () => {
   const { microservices, restartMicroservice } = useCloud();
+  const [selectedService, setSelectedService] = useState<Microservice | null>(null);
 
   return (
     <div className="bg-[#10121a] border border-[#232838] rounded-xl p-5 shadow-xl flex flex-col justify-between select-none">
@@ -14,7 +17,7 @@ export const ServiceHealthGrid: React.FC = () => {
           <h3 className="font-bold text-sm text-white">Microservice Mesh & Pod Replicas</h3>
         </div>
         <span className="text-xs text-zinc-400 font-mono">
-          5 Core Services
+          Click service to inspect & scale
         </span>
       </div>
 
@@ -38,8 +41,15 @@ export const ServiceHealthGrid: React.FC = () => {
               const isDegraded = svc.status === 'degraded';
 
               return (
-                <tr key={svc.id} className="hover:bg-[#161924] transition-colors">
-                  <td className="p-2 font-bold text-white font-sans">{svc.name}</td>
+                <tr 
+                  key={svc.id} 
+                  onClick={() => setSelectedService(svc)}
+                  className="hover:bg-[#161924] transition-colors cursor-pointer group"
+                >
+                  <td className="p-2 font-bold text-white font-sans flex items-center gap-2">
+                    <span>{svc.name}</span>
+                    <Sliders className="w-3 h-3 text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </td>
                   <td className="p-2 text-zinc-400">{svc.type}</td>
                   <td className="p-2 text-emerald-400">{svc.uptimePercent}%</td>
                   <td className="p-2 text-cyan-400">{svc.p99LatencyMs}ms</td>
@@ -59,11 +69,14 @@ export const ServiceHealthGrid: React.FC = () => {
                     <button
                       type="button"
                       disabled={isRestarting}
-                      onClick={() => restartMicroservice(svc.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        restartMicroservice(svc.id);
+                      }}
                       className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#1b1f2e] hover:bg-indigo-600 disabled:opacity-50 text-zinc-300 hover:text-white rounded text-[10px] font-bold font-sans transition-colors cursor-pointer"
                     >
                       <RotateCcw className={`w-3 h-3 ${isRestarting ? 'animate-spin' : ''}`} />
-                      <span>{isRestarting ? 'Restarting...' : 'Rolling Restart'}</span>
+                      <span>{isRestarting ? 'Restarting...' : 'Restart'}</span>
                     </button>
                   </td>
                 </tr>
@@ -72,6 +85,13 @@ export const ServiceHealthGrid: React.FC = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Pod Scale Modal */}
+      <PodScaleModal
+        service={selectedService}
+        isOpen={selectedService !== null}
+        onClose={() => setSelectedService(null)}
+      />
     </div>
   );
 };

@@ -2,6 +2,7 @@ import React from 'react';
 import { CloudProvider } from './context/CloudContext';
 import { Header } from './components/layout/Header';
 import { MetricsGauges } from './components/metrics/MetricsGauges';
+import { SLAGaugeCard } from './components/metrics/SLAGaugeCard';
 import { GlobalEdgeMap } from './components/map/GlobalEdgeMap';
 import { LiveLogStream } from './components/logs/LiveLogStream';
 import { IncidentCenter } from './components/incidents/IncidentCenter';
@@ -19,6 +20,9 @@ export const AppContent: React.FC = () => {
         {/* Real-Time Telemetry Gauges */}
         <MetricsGauges />
 
+        {/* SLA & Reliability Compliance */}
+        <SLAGaugeCard />
+
         {/* Mid Grid: Global Edge Map & Incident Auto-Remediation */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <GlobalEdgeMap />
@@ -34,7 +38,7 @@ export const AppContent: React.FC = () => {
 
       {/* Footer */}
       <footer className="bg-[#0c0e14] border-t border-[#232838] py-4 px-6 text-center text-xs text-zinc-500 font-mono">
-        © 2026 CloudPulse Systems • Real-time Cloud Observability & Self-Healing SRE Platform
+        © 2026 CloudPulse Systems • Enterprise OpenTelemetry & Self-Healing SRE Platform
       </footer>
 
       {/* Toast Alerts */}
